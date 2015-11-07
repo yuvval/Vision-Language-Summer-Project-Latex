@@ -48,7 +48,7 @@ First line of institution2 address\\
 
 %%%%%%%%% ABSTRACT
 \begin{abstract}
- We constructed a system that tracks activities in videos, given a descriptive text sentence, and outputs the likelihood of how well the description match the activity in the video. We integrated depth estimation for single-len camera, and demonstrated its ability to track 3D actions in single-len camera videos. That could not be otherwise addressed. 
+ We constructed a system that tracks activities in videos, given a descriptive text sentence, and outputs the likelihood of how well the description match the activity in the video. We integrated depth estimation for single-lens camera, and demonstrated its ability to track 3D actions in single-lens camera videos, that could not be otherwise addressed. 
  
 
 \end{abstract}
@@ -56,26 +56,15 @@ First line of institution2 address\\
 %%%%%%%%% BODY TEXT
 \section{Introduction}
 
-TBD
+Understanding complex visual scenes, has many aspects: inferring the structure of the scene, detecting and labeling objects, recognizing people, their actions and their interactions, retrieving an image or video given a description, image generation from captions, automatic caption generation and telling the story shown at the scene.
 
-\subsection{Vision and language system}
+In the past few years, the task of image classification has taken a huge leap in performance, achieving near-human-level accuracy \cite{imagenetHistory, krizhevsky2012imagenet, googlenet}. It was combined with object detection algorithms to generate objects class proposals given an image scene \cite{googlenet, girshick2014rcnn}. The main drawback of these approaches is that they avoid the problem of understanding the structure withing a scene, and do not take into account the relationship between objects and their attributes in a scene. Current state-of-the-art approaches mostly rely on low level cues and moving search windows to identify objects suggestions and lack a probabilistic framework for understanding the scenes structure. For example, understanding that a dog is chasing a human, rather than a human is chasing a dog.
 
- integrates language and videos. Basically, we run an object detector on each frame, allowing many false-positive (so detection rate will be high). Now we treat the detections as the states of a generalized HMM of a tracker that gives high score for coherency between frames (we use optical flow to account for movemennt), and do inference over it (with viterbi decoder) to find the best track. 
-On top of the tracker HMM there's another layer of language HMM, which biases the tracker results. In fact, we match a tracker for each noun, and do joint inference on all together. So for example a verb with 2 nouns (a person approaches a chair) will generate two trackers, one for each noun. The observations of the 1st noun will be classes of detections of the 1st tracker. The observations of the 2nd noun will be classes of detections of the 2nd tracker. The observations of verb will be the relative distances and velocities between the detetcions of both trackers.
-We take the outer product of all possible states of all the HMMs and combine them to a single viterbi inference mechanism. So eventually you result with tracking on only the actions that were described in the sentence (kind of an attention mechanism), and you get a likelihood score for how well this action corresponds to the events in the video. Now since HMM are generative models, you can actually do many other tasks with this mechanism, such as generating descriptions from videos, question answering, ...
-
-%-------------------------------------------------------------------------
-\subsubsection{Integrating depth estimation}
-TBD
-
-\subsection{Results}
-TBD
+In this work we followed the approach of \cite{siddharth2014seeing}, which provides a medium for a multimodal integration of vision and language in videos. This approach uses the textual description and grammar as top-down prior for detection and understanding interactions, and integrates it with bottom-up object proposals and optical flow inference. We integrated depth estimation \cite{depthfayao} for single-lens camera, and demonstrated its ability to track 3D actions in single-lens camera videos, that could not be otherwise addressed. 
 
 
-%in~\cite{Authors14b}''.  Then submit the techreport as additional material.
 
-
-\begin{figure}[t]
+\begin{figure}[ht]
 \begin{center}
 %\fbox{\rule{0pt}{2in} \rule{0.9\linewidth}{0pt}}
    \includegraphics[width=0.8\linewidth]{system_overview.png}
@@ -84,42 +73,69 @@ TBD
 \label{fig_system}
 \end{figure}
 
-\subsection{Miscellaneous}
+\section{Vision and language system}
 
-\noindent
-Compare the following:\\
-\begin{tabular}{ll}
- \verb'$conf_a$' &  $conf_a$ \\
- \verb'$\mathit{conf}_a$' & $\mathit{conf}_a$
-\end{tabular}\\
-See The \TeX book, p165.
 
+A VERY ROUGH SKETCH... TO REPHRASE TEXT BETTER:
+
+We run an object detector on each frame, allowing many false-positive (so detection rate will be high). Now we treat the detections as the states of a generalized HMM of a tracker that gives high score for coherency between frames (we use optical flow to account for movemennt), and do inference over it (with viterbi decoder) to find the best track. 
+On top of the tracker HMM there's another layer of language HMM, which biases the tracker results. In fact, we match a tracker for each noun, and do joint inference on all together. So for example a verb with 2 nouns (a person approaches a chair) will generate two trackers, one for each noun. The observations of the 1st noun will be classes of detections of the 1st tracker. The observations of the 2nd noun will be classes of detections of the 2nd tracker. The observations of verb will be the relative distances and velocities between the detetcions of both trackers.
+We take the outer product of all possible states of all the HMMs and combine them to a single viterbi inference mechanism. So eventually you result with tracking on only the actions that were described in the sentence (kind of an attention mechanism), and you get a likelihood score for how well this action corresponds to the events in the video. Now since HMM are generative models, you can actually do many other tasks with this mechanism, such as generating descriptions from videos, question answering, ...
+
+%-------------------------------------------------------------------------
+\subsection{Integrating depth estimation}
 TBD
 
-\begin{figure*}
+\section{Results}
+TBD
+
+REFERENCES TO FIGURES AND TABLE:
+
+A system overview is shown in Figure \ref{fig_system}.
+
+An example for depth estimation using \cite{depthfayao} in Figure \ref{fig_depth_frame}.
+
+Figure \ref{fig_front_vs_side} shows example frames for experimenting with videos of \textit{"A person approaches a chair"}, in side approach versus frontal approach.
+
+Table \ref{table_likelihood} shows likelihood scores of textual descriptions in videos of frontal approach and side approach, while comparing 2D inference \cite{siddharth2014seeing} vs 3D inference (ours).
+
+
+\begin{figure}[ht]
 \begin{center}
 %\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
    \includegraphics[width=0.8\linewidth]{depth_estim_example.png}
    \end{center}
    \caption{Example for depth estimation in a single frame}
 \label{fig_depth_frame}
-\end{figure*}
+\end{figure}
 
-TBD
-
-\begin{figure*}
+\begin{figure}[ht]
 \begin{center}
 %\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
    \includegraphics[width=0.8\linewidth]{front_vs_side_approach.png}
    \end{center}
    \caption{"A person approaches a chair": frontal vs side approach}
 \label{fig_front_vs_side}
-\end{figure*}
+\end{figure}
 
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline 
+  & Side approach & Frontal approach  \\
+\hline\hline
+3D (ours) & -43 & -50\\
+2D \cite{siddharth2014seeing} & -10 & -1020 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Likelihood scores of textual descriptions in videos of frontal approach and side approach, while comparing 2D inference \cite{siddharth2014seeing} vs 3D inference (ours). We see that the 2D system breaks when the action requires perceiving the depth.}
+\label{table_likelihood}
+\end{table}
 
 {\small
 \bibliographystyle{ieee}
-\bibliography{egbib}
+\bibliography{references}
 }
 
 \end{document}
